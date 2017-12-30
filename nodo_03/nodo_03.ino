@@ -1,17 +1,14 @@
+#include "Arduino.h"
 
-/*
- *  
- *  nodo poggiolo
- *  IP 192.168.1.43
- *  climate_01_online
- *  MAC 18:FE:34:E1:22:B9
- *  
- */
+/*  2017 LucaSOp */
 
-/*
- * File password in libraries/Secret/Secret.h
- */
- 
+const char* DESC = "nodo_03-DHT+buzzar-soggiorno";
+const char* VERS = "v1.0.0";
+const char* IP = "192.168.1.42";
+const char* MAC = "18:FE:34:E1:22:B9";
+const char* HA_ENTITY_ID = "sensor.itemperature2";
+
+/* File password in libraries/Secret/Secret.h */
 #include <Secret.h>
 
 #include <ESP8266WiFi.h>
@@ -24,8 +21,8 @@ const uint16_t INFLUXDB_PORT = S_INFLUXDB_PORT;
 const char *DATABASE = S_INFLUXDB_DATABASE;
 const char *DB_USER = S_INFLUXDB_DB_USER;
 const char *DB_PASSWORD = S_INFLUXDB_DB_PASSWORD;
-
 Influxdb influxdb(INFLUXDB_HOST, INFLUXDB_PORT);
+
 
 /******************* OTA lib *********************/
 #include <ESP8266mDNS.h>
@@ -46,19 +43,13 @@ const char* wifi_password = S_WIFI_PASSWORD;
 #define mqtt_user S_MQTT_USER
 #define mqtt_password S_MQTT_PASSWORD
 
-#define humidity_topic "sensor/humidity"
-#define temperature_topic "sensor/temperature"
+#define humidity_topic "sensor/humidity2"
+#define temperature_topic "sensor/temperature2"
 String name_client_id="ESP8266-"; //This text is concatenated with ChipId to get unique client_id
 //String strTopic="";
 //String msg="";
 //String receivedChar="";
-
-
-const unsigned reading_count = 10; // Numbber of readings each time in order to stabilise
-unsigned int analogVals[reading_count];
-unsigned int counter = 0;
-unsigned int values_avg = 0;
-const int powersoil = D8; // Digital Pin 8 will power the sensor, acting as switch
+#define BUZZER_PIN  4
 
 
 /*******************  Topic MQTT OTA *****************/
@@ -72,21 +63,49 @@ char* mode_topic = "sensor/mode";
 WiFiClient espClient;
 PubSubClient client(espClient);
 int HeatingPin = 5;
-String switch2;
+String switch1;
 String strTopic;
 String strPayload;
+String buzzer1;
+
 
 
 #define DHTTYPE DHT22
-#define DHTPIN  14
+#define DHTPIN  5
+#14
 DHT dht(DHTPIN, DHTTYPE); 
 
 
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\r\nBooting...");
 
+  // StartUp Banner
+  Serial.println("#######################################################################");
+
+  Serial.print( "Descrizione: ");
+  Serial.println( DESC );
+  
+  Serial.print( "Version: ");
+  Serial.println( VERS );
+  Serial.println( "GITHUB repository HOME_ONE" );
+
+  Serial.print( "IP: ");
+  Serial.println( IP );
+
+  Serial.print( "MAC_ADD: ");
+  Serial.println( MAC );
+
+  Serial.print( "HA_ENTITY_ID: ");
+  Serial.println( HA_ENTITY_ID );
+
+  Serial.println("#######################################################################");
+ 
+  Serial.println("\r\nBooting...");
+  Serial.println("Project name: -- influxdb_sensor_DHT_switch_indoor --");
+  
+//  pinMode(BUZZER_PIN, OUTPUT);
+//  digitalWrite(BUZZER_PIN, HIGH); 
   
   dht.begin();
   setup_wifi();
@@ -126,13 +145,12 @@ void setup() {
 */
 
 
-  client.setServer(mqtt_server, S_MQTT_PORT);
+  client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 
-  pinMode(HeatingPin, OUTPUT);
-  digitalWrite(HeatingPin, HIGH);
+  pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(BUZZER_PIN, HIGH);
 
-  pinMode(powersoil,OUTPUT);
 
   Serial.println("Setup completed! Running ...");
 }
@@ -160,18 +178,22 @@ void setup_wifi() {
 void callback(char* topic, byte* payload, unsigned int length) {
   payload[length] = '\0';
   strTopic = String((char*)topic);
-  if(strTopic == "ha/switch2")
+  if(strTopic == "ha/buzzer1")
     {
-    switch2 = String((char*)payload);
-    if(switch2 == "ON")
+    buzzer1 = String((char*)payload);
+    Serial.println(buzzer1);
+    if(buzzer1 == "ON")
       {
-        Serial.println("ON");
-        digitalWrite(HeatingPin, HIGH);
-      }
+        digitalWrite(BUZZER_PIN, LOW); 
+        Serial.println(" Turn On BUZZER! ");
+//        suona(); 
+       }
     else
       {
-        Serial.println("OFF");
-        digitalWrite(HeatingPin, LOW);
+        digitalWrite(BUZZER_PIN, HIGH);
+        //noTone(BUZZER_PIN);     // Stop sound.. 
+        Serial.println(" Turn Off BUZZER! ");
+
       }
     }
 }
@@ -182,7 +204,7 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-       if (client.connect("ESP8266Client_04", mqtt_user, mqtt_password)) {
+       if (client.connect("ESP8266Client_22", mqtt_user, mqtt_password)) {
       Serial.println("connected");
       // Once connected, publish an announcement...
       client.subscribe("ha/#");
@@ -203,9 +225,10 @@ bool checkBound(float newValue, float prevValue, float maxDiff) {
 }
 
 long lastMsg = 0;
-float soil = 0.0;
-float diff = 1.0;
-double analogValue = 0.0;
+float temp = 0.0;
+float hum = 0.0;
+float diff = 0.2;
+float diffu = 1.0;
 
 void loop() {
   ArduinoOTA.handle();
@@ -215,40 +238,16 @@ void loop() {
   }
   client.loop();
 
-  values_avg = 0;
-  counter = 0;
-
+  
 
   long now = millis();
-  if (now - lastMsg > 1000*60*15) {
+  if (now - lastMsg > 2000) {
     lastMsg = now;
 
-    Serial.println("Powering module ON");
-    digitalWrite(powersoil, HIGH);
-    delay(1000);
+    float newTemp = dht.readTemperature();
+    float newHum = dht.readHumidity();
 
-  //  float newSoil = 1024 - analogRead(A0); // read the analog signal;
-
-      // read the input on analog pin 0:
-    for( counter = 0; counter < reading_count; counter++){
-   //   Serial.println("Reading probe value...:");
-      analogVals[reading_count] = 1024 - analogRead(A0);
-      delay(100);
-      
-      values_avg = (values_avg + analogVals[reading_count]);
- //     Serial.println(analogVals[reading_count]);
- //     Serial.print("Total Readings value...:");
- //     Serial.println(values_avg);
-    }
-    values_avg = values_avg/reading_count;
-    Serial.println(values_avg);
-    
-    
-    float newSoil = map(values_avg,600,1024,0,100);
-
-    
-
-    if (checkBound(newSoil, soil, diff)) {
+    if (checkBound(newTemp, temp, diff)) {
       /*
       Serial.print("temp: ");
       Serial.print(String(temp).c_str());
@@ -257,15 +256,15 @@ void loop() {
       Serial.print(" diff: ");
       Serial.println(String(diff).c_str());
       */
-      soil = newSoil;
-      Serial.print("New Soil:");
-      Serial.println(String(soil).c_str());
+      temp = newTemp;
+      Serial.print("New temperature:");
+      Serial.println(String(temp).c_str());
 
       // Create field object with measurment name=power_read
-      FIELD dataObj("soil_table");
+      FIELD dataObj("temp_table");
       dataObj.addTag("method", "Field_object"); // Add method tag
-      dataObj.addTag("soil", "S0"); // Add pin tag
-      dataObj.addField("value", soil); // Add value field
+      dataObj.addTag("temperature", "T1"); // Add pin tag
+      dataObj.addField("value", temp); // Add value field
       Serial.println(influxdb.write(dataObj) == DB_SUCCESS ? "Object write success" : "Writing failed");
       // Empty field object.
       dataObj.empty();
@@ -273,8 +272,23 @@ void loop() {
       //client.publish(temperature_topic, String(temp).c_str(), true);
     }
 
-  Serial.println("Powering module OFF");
-  digitalWrite(powersoil, LOW);
-    
+    if (checkBound(newHum, hum, diffu)) {
+      hum = newHum;
+      Serial.print("New humidity:");
+      Serial.println(String(hum).c_str());
+
+      // Create field object with measurment name=power_read
+      FIELD dataObj("Humidity_table");
+      dataObj.addTag("method", "Field_object"); // Add method tag
+      dataObj.addTag("humidity", "H1"); // Add pin tag
+      dataObj.addField("value", hum); // Add value field
+      Serial.println(influxdb.write(dataObj) == DB_SUCCESS ? "Object write success" : "Writing failed");
+      // Empty field object.
+      dataObj.empty();
+
+
+      
+      //client.publish(humidity_topic, String(hum).c_str(), true);
+    }
   }
 }

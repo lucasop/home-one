@@ -1,12 +1,13 @@
+#include "Arduino.h"
 
-/*
- *  
- *  nodo poggiolo
- *  IP 192.168.1.49
- *  climate_01_online
- *  MAC 18:FE:34:E1:2D:1E
- *  
- */
+/*  2017 LucaSOp */
+
+const char* DESC = "nodo_02-DHT+switch-poggiolo";
+const char* VERS = "v1.0.0";
+const char* IP = "192.168.1.49";
+const char* MAC = "18:FE:34:E1:2D:1E";
+const char* HA_ENTITY_ID = "sensor.itemperature";
+
 
 /* CHANGELOG
  *  20170426  aggiunta lettura pin Analogico A0 DUST
@@ -27,10 +28,7 @@
 #include <PubSubClient.h>
 #include <ESP8266Influxdb.h>
 
-/*
- * File password in libraries/Secret/Secret.h
- */
- 
+/* File password in libraries/Secret/Secret.h */
 #include <Secret.h>
 
 /******************* influxdb  *********************/
@@ -39,7 +37,6 @@ const uint16_t INFLUXDB_PORT = S_INFLUXDB_PORT;
 const char *DATABASE = S_INFLUXDB_DATABASE;
 const char *DB_USER = S_INFLUXDB_DB_USER;
 const char *DB_PASSWORD = S_INFLUXDB_DB_PASSWORD;
-
 Influxdb influxdb(INFLUXDB_HOST, INFLUXDB_PORT);
 
 
@@ -110,6 +107,30 @@ float dustDensity = 0;
 
 void setup() {
   Serial.begin(115200);
+
+  // StartUp Banner
+  Serial.println("#######################################################################");
+
+  Serial.print( "Descrizione: ");
+  Serial.println( DESC );
+  
+  Serial.print( "Version: ");
+  Serial.println( VERS );
+  Serial.println( "GITHUB repository HOME_ONE" );
+
+  Serial.print( "IP: ");
+  Serial.println( IP );
+
+  Serial.print( "MAC_ADD: ");
+  Serial.println( MAC );
+
+  Serial.print( "HA_ENTITY_ID: ");
+  Serial.println( HA_ENTITY_ID );
+
+  Serial.println("#######################################################################");
+ 
+
+
   Serial.println("\r\nBooting...");
 
   

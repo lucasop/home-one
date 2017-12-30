@@ -1,37 +1,20 @@
 #include "Arduino.h"
-/*
- *  This sketch sends ads1115 current sensor data via HTTP POST request to thingspeak server.
- *  It needs the following libraries to work (besides the esp8266 standard libraries supplied with the IDE):
- *
- *  - https://github.com/adafruit/Adafruit_ADS1X15
- *
- *  designed to run directly on esp8266-01 module, to where it can be uploaded using this marvelous piece of software:
- *
- *  https://github.com/esp8266/Arduino
- *
- *  2015 Tisham Dhar
- *  licensed under GNU GPL
- */
 
-/*
- *  
- *  nodo giroscale
- *  IP 192.168.1.89
- *  power_01_online
- *  MAC   60:01:94:0E:A5:24
- *  
- */
+/*  2017 LucaSOp */
 
-/*
- * File password in libraries/Secret/Secret.h
- */
- 
+const char* DESC = "nodo_01-Enery Monitor-giroscale";
+const char* VERS = "v1.0.0";
+const char* IP = "192.168.1.89";
+const char* MAC = "60:01:94:0E:A5:24";
+const char* HA_ENTITY_ID = "sensor.irealpower";
+
+/* File password in libraries/Secret/Secret.h */
 #include <Secret.h>
 
 #include <ESP8266WiFi.h>
-#include <Wire.h>
 #include <Adafruit_ADS1015.h>
 #include <ESP8266Influxdb.h>
+#include <Wire.h>
 
 /******************* influxdb  *********************/
 const char *INFLUXDB_HOST = S_INFLUXDB_HOST;
@@ -243,6 +226,29 @@ void setup() {
  // delay(500);
   
   Serial.begin(115200);
+
+  // StartUp Banner
+  Serial.println("#######################################################################");
+
+  Serial.print( "Descrizione: ");
+  Serial.println( DESC );
+  
+  Serial.print( "Version: ");
+  Serial.println( VERS );
+  Serial.println( "GITHUB repository HOME_ONE" );
+
+  Serial.print( "IP: ");
+  Serial.println( IP );
+
+  Serial.print( "MAC_ADD: ");
+  Serial.println( MAC );
+
+  Serial.print( "HA_ENTITY_ID: ");
+  Serial.println( HA_ENTITY_ID );
+
+  Serial.println("#######################################################################");
+  
+
   setup_wifi();
 
   Serial.print("Configuring OTA device...");
