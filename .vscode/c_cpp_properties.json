@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:\\Users\\37413900\\Documents\\prj\\VScode-project\\home-one\\libraries\\Secrets",
+                "C:\\Users\\37413900\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.4.0\\cores\\esp8266",
+                "C:\\Users\\37413900\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.4.0\\libraries\\ESP8266WiFi\\src",
+                "C:\\Users\\37413900\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.4.0\\libraries\\ArduinoOTA",
+                "C:\\Users\\37413900\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.4.0\\libraries\\Wire",
+                "C:\\Users\\37413900\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.4.0\\libraries\\ESP8266mDNS",
+                "C:\\Users\\37413900\\Documents\\prj\\VScode-project\\home-one\\libraries\\Adafruit_ADS1X15"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": false,
+                "path": [
+                    "C:\\Users\\37413900\\Documents\\prj\\VScode-project\\home-one\\libraries\\Secrets",
+                    "C:\\Users\\37413900\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.4.0\\cores\\esp8266",
+                    "C:\\Users\\37413900\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.4.0\\libraries\\ESP8266WiFi\\src",
+                    "C:\\Users\\37413900\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.4.0\\libraries\\ArduinoOTA",
+                    "C:\\Users\\37413900\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.4.0\\libraries\\Wire",
+                    "C:\\Users\\37413900\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.4.0\\libraries\\ESP8266mDNS",
+                    "C:\\Users\\37413900\\Documents\\prj\\VScode-project\\home-one\\libraries\\Adafruit_ADS1X15"
+                ]
+            },
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 3
+}
