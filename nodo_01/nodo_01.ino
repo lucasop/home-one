@@ -10,7 +10,6 @@ const char* HA_ENTITY_ID = "sensor.irealpower";
 
 /* File password in libraries/Secret/Secret.h */
 #include <Secret.h>
-
 #include <ESP8266WiFi.h>
 #include <Adafruit_ADS1015.h>
 #include <ESP8266Influxdb.h>
