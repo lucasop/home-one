@@ -1,5 +1,5 @@
 {
-    "board": "esp8266:esp8266:nodemcuv2",
-    "configuration": "CpuFrequency=80,FlashSize=4M1M,LwIPVariant=v2mss536,Debug=Disabled,DebugLevel=None____,UploadSpeed=115200",
-    "sketch": "nodo_01\\nodo_01.ino"
+    "board": "espressif:esp32:nodemcu-32s",
+    "configuration": "FlashFreq=80,UploadSpeed=921600",
+    "sketch": "..\\home-32\\BLE_Proximity_Sensor\\BLE_Proximity_Sensor.ino"
 }
