@@ -199,11 +199,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
       {
         Serial.println("ON");
         digitalWrite(HeatingPin, HIGH);
+        client.publish("ha/stateswitch1", "1"); // meggaggio di conferma al server  state_topic: "ha/stateswitch1"
       }
     else
       {
         Serial.println("OFF");
         digitalWrite(HeatingPin, LOW);
+        client.publish("ha/stateswitch1", "0"); // meggaggio di conferma al server  state_topic: "ha/stateswitch1"
       }
     }
 }
