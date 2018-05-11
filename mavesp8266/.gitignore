@@ -1,0 +1,5 @@
+.pioenvs
+platformio.sublime*
+platformio.pro*
+tests
+research
